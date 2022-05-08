@@ -65,10 +65,11 @@ def deal_msg():
         print(image_url)
       else:
         # 尝试找msg-file
-        contenttag = divtag.find('p', {'class': 'msg-file__title'})
+        contenttag = divtag.find('div', {'class': 'msg-file__content'})
         if contenttag:
-          file_title = contenttag.text
-          print(file_title)
+          file_title = contenttag.find('p', {'class' : 'msg-file__title'}).text
+          file_desc = contenttag.find('p', {'class' : 'msg-file__desc'}).text
+          print(file_title+' '+file_desc)
   # """
   # 发送数据，比如发送给zotero接口  
 
