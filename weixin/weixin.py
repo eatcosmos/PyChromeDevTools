@@ -13,6 +13,32 @@ import json
 # print(messages)
 
 chrome = PyChromeDevTools.ChromeInterface(host="127.0.0.1", port=9222)
+# 获取微信tab对象
+# 打印所有tab页面的url和标题
+idx = 0
+for tab in chrome.tabs:
+  # print(tab['url'], tab['title'])
+  if tab['url'] == "https://filehelper.weixin.qq.com/":
+    print(tab['title'])
+    break
+  idx = idx + 1
+chrome = PyChromeDevTools.ChromeInterface(host="127.0.0.1", port=9222, tab=idx)
+li_cnt_befor, li_cnt_after = 0, 0 # 初始化全局变量
+
+# 获取li个数
+def get_li_cnt():
+  dom = chrome.DOM.getDocument(depth=-1) # -1表示什么？
+  html = chrome.DOM.getOuterHTML(nodeId=dom[0]['result']['root']['nodeId']) # nodeId
+  html = html[0]['result']['outerHTML']
+  soup = BS(html, features="html.parser")
+  try:
+    ultag = soup.find('ul', {'class': 'msg-list'}) # 找<ul>
+    litags = ultag.find_all('li') # 找新增的<li>
+    li_cnt = len(litags)
+  except:
+    li_cnt = 0
+  print('有 '+str(li_cnt)+' 个li...')
+  return li_cnt
 
 # 处理数据
 def deal_msg():
@@ -42,9 +68,10 @@ def deal_msg():
   # """
   soup = BS(html, features="html.parser")
   ultag = soup.find('ul', {'class': 'msg-list'}) # 找<ul>
-  litag = ultag.find_all('li')[-1] # 找新增的<li>
+  litags = ultag.find_all('li') # 找新增的<li>
+  li_cnt_befor = len(litags) # 更新 li_cnt_befor
   # print(type(litags)) # bs4.element.ResultSet
-  divtag = litag.find('div', {'class': 'msg-item__content'}) # 找消息，这个是肯定有的
+  divtag = litags[-1].find('div', {'class': 'msg-item__content'}) # 找消息，这个是肯定有的
   # 尝试找msg-appmsg
   contenttag = divtag.find('div', {'class': 'msg-appmsg'})
   if contenttag:
@@ -78,14 +105,29 @@ def deal_msg():
   # 发送数据，比如发送给zotero接口  
 
 def test_PyChromeDevTools():
-    # 初始化cdp（默认连接第一个tab页面）
-    # chrome = PyChromeDevTools.ChromeInterface(host="127.0.0.1", port=9222) # 通过构造函数ChromeInterface创建对象即可完成接口对象初始化
+    chrome = PyChromeDevTools.ChromeInterface(host="127.0.0.1", port=9222)
+    # 获取微信tab对象
+    # 打印所有tab页面的url和标题
+    idx = 0
+    for tab in chrome.tabs:
+      # print(tab['url'], tab['title'])
+      if tab['url'] == "https://filehelper.weixin.qq.com/":
+        print(tab['title'])
+        break
+      idx = idx + 1
+    chrome = PyChromeDevTools.ChromeInterface(host="127.0.0.1", port=9222, tab=idx)
+    li_cnt_befor, li_cnt_after = 0, 0 # 初始化全局变量
 
     # 启用域/Domains
     chrome.Network.enable()
     chrome.Page.enable()
     chrome.Debugger.enable()
     chrome.Dom.enable()
+    chrome.DOMDebugger.enable()
+
+    dom = chrome.DOM.getDocument(depth=-1) # -1表示什么？
+    chrome.DOMDebugger.setDOMBreakpoint(nodeId=4, type="subtree-modified")
+    # chrome.DOMDebugger.setEventListenerBreakpoint(eventName="subtree-modified", targetName="*")
 
     # 打印所有tab页面的url和标题
     for tab in chrome.tabs:
@@ -103,24 +145,59 @@ def test_PyChromeDevTools():
         frame_top.get('id', ''), frame_top.get('parentId', ''), frame_top.get('url', '')
     ))
 
-    print('处理遗留阻塞信息...')
+    # 处理遗留阻塞信息...
+    li_cnt_befor = get_li_cnt()
     chrome.Debugger.resume() # 相当于鼠标点击继续运行
-    try:
-      deal_msg()
-    except:
-      pass
+    li_cnt_after = get_li_cnt()
+    if li_cnt_after > li_cnt_befor:
+      li_cnt_befor = li_cnt_after # 更新 li_cnt_befor
+      print('处理遗留阻塞信息...')
+      try:
+        deal_msg()
+      except:
+        pass
 
+    
     print('循环等待事件...')
+    li_cnt_befor
     while 1:
-      matching_event, all_events = chrome.wait_event("Debugger.paused", timeout=60) # 等待事件，立即返回
+      matching_event, all_events = chrome.wait_event("Debugger.paused", timeout=1) # 等待事件，立即返回
       if matching_event is None:
-        # print(matching_event)
-        pass # 如果没有等到事件，就进入下一个等待
+        # 处理遗留阻塞信息...
+        # li_cnt_befor = get_li_cnt()
+        chrome.Debugger.resume() # 相当于鼠标点击继续运行
+        try:
+          li_cnt_after = get_li_cnt()
+        except:
+          # 说明网页出现问题了，重启weixin.py
+          print('微信文件传输助手网页版正在重启...')
+          main()
+        if li_cnt_after > li_cnt_befor:
+          li_cnt_befor = li_cnt_after
+          print('处理遗留阻塞信息...')
+          try:
+            deal_msg()
+          except:
+            pass
         continue
-      # print('触发DOM 断点...')
-      # Resume script execution
-      chrome.Debugger.resume() # 相当于鼠标点击继续运行
+      # print('触发DOM 断点...') # 说明 li 肯定增加了
+      chrome.Debugger.resume() # Resume script execution 相当于鼠标点击继续运行
       # 处理数据
-      deal_msg()
+      try:
+        deal_msg()
+      except:
+        pass
+      
+      """
+      li_cnt_befor = get_li_cnt()
+      chrome.Debugger.resume() # 相当于鼠标点击继续运行
+      li_cnt_after = get_li_cnt()
+      if li_cnt_after > li_cnt_befor: # 说明有新信息
+        deal_msg()
+      time.sleep(2)
+      """
+def main():      
+  test_PyChromeDevTools()
 
-test_PyChromeDevTools()
+if __name__ == "__main__":
+  main()
