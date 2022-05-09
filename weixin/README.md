@@ -9,17 +9,27 @@
 git clone https://github.com/eatcosmos/PyChromeDevTools.git
 或者直接下载 https://github.com/eatcosmos/PyChromeDevTools/archive/refs/heads/master.zip
 
-# 安装用到的现成的python软件包
-pip3 isntall PyChromeDevTools
-pip3 install Beautifulsoup4
-<!-- pip3 install pyautogui -->
-<!-- pip3 install Pillow -->
+
 
 # 配置chrome启动参数
+ "https://filehelper.weixin.qq.com/" --remote-debugging-port=9222 --enable-benchmarking --enable-net-benchmarking
 通过桌面快捷方式打开chrome
 # 扫描登录文件传输助手网页版
 https://filehelper.weixin.qq.com/
+http://127.0.0.1:9222/json/new?https://filehelper.weixin.qq.com 新开Tab打开指定地址
+http://127.0.0.1:9222/json 查看已经打开的Tab列表
+http://127.0.0.1:9222/json/activate/3180EF356AB532ED6425DC232E489E1A 切换到目标Tab
+ul.msg-list
 
+# 配置vscode
+1. 安装python扩展
+2. 为python扩展选择之前安装的python程序
+
+# 安装用到的现成的python软件包
+pip3 install PyChromeDevTools
+pip3 install Beautifulsoup4
+<!-- pip3 install pyautogui -->
+<!-- pip3 install Pillow -->
 # 通过vscode运行weixin.py
 终端就会打印消息了
 

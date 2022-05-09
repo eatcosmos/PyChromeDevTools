@@ -51,17 +51,20 @@ def deal_msg():
     article_url = contenttag.find('a', {'class' : 'msg-appmsg__content'})['href']
     article_title = contenttag.find('h4', {'class' : 'msg-appmsg__title'}).text
     article_desc = contenttag.find('p', {'class' : 'msg-appmsg__desc'}).text
+    print('收到文章消息...')
     print(article_url+' '+article_title+' '+article_desc)
   else:
     # 尝试找msg-text
     contenttag = divtag.find('div', {'class': 'msg-text'})
     if contenttag:
+      print('收到文本消息...')
       print(contenttag.text)
     else:
       # 尝试找msg-image
       contenttag = divtag.find('div', {'class': 'msg-image'})
       if contenttag:
         image_url = contenttag.find('img')['src']
+        print('收到图片消息...')
         print(image_url)
       else:
         # 尝试找msg-file
@@ -69,6 +72,7 @@ def deal_msg():
         if contenttag:
           file_title = contenttag.find('p', {'class' : 'msg-file__title'}).text
           file_desc = contenttag.find('p', {'class' : 'msg-file__desc'}).text
+          print('收到文件消息...')
           print(file_title+' '+file_desc)
   # """
   # 发送数据，比如发送给zotero接口  
@@ -101,7 +105,10 @@ def test_PyChromeDevTools():
 
     print('处理遗留阻塞信息...')
     chrome.Debugger.resume() # 相当于鼠标点击继续运行
-    deal_msg()
+    try:
+      deal_msg()
+    except:
+      pass
 
     print('循环等待事件...')
     while 1:
@@ -110,7 +117,7 @@ def test_PyChromeDevTools():
         # print(matching_event)
         pass # 如果没有等到事件，就进入下一个等待
         continue
-      print('收到信息...')
+      # print('触发DOM 断点...')
       # Resume script execution
       chrome.Debugger.resume() # 相当于鼠标点击继续运行
       # 处理数据
