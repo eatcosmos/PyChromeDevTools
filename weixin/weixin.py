@@ -37,7 +37,7 @@ def get_li_cnt():
     li_cnt = len(litags)
   except:
     li_cnt = 0
-  print('有 '+str(li_cnt)+' 个li...')
+  # print('有 '+str(li_cnt)+' 个li...')
   return li_cnt
 
 # 处理数据
@@ -180,13 +180,23 @@ def test_PyChromeDevTools():
           except:
             pass
         continue
+      
       # print('触发DOM 断点...') # 说明 li 肯定增加了
       chrome.Debugger.resume() # Resume script execution 相当于鼠标点击继续运行
       # 处理数据
       try:
-        deal_msg()
+        li_cnt_after = get_li_cnt()
       except:
-        pass
+        # 说明网页出现问题了，重启weixin.py
+        print('微信文件传输助手网页版正在重启...')
+        main()
+      if li_cnt_after > li_cnt_befor:
+        li_cnt_befor = li_cnt_after
+        print('处理遗留阻塞信息...')
+        try:
+          deal_msg()
+        except:
+          pass
       
       """
       li_cnt_befor = get_li_cnt()
