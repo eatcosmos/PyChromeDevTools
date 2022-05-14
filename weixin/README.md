@@ -1,9 +1,12 @@
 # 借助云服务器，收藏微信文章、文本到zotero文件夹
-## 视频
+
+
+## 完整原始编程过程录屏视频
+无剪辑，少部分过程忘记录了或者没录，主要是为了分享实现过程本身。
+https://www.bilibili.com/video/av726567944
 
 ## 文档
 https://github.com/eatcosmos/PyChromeDevTools/blob/master/weixin/README.md
-
 ## 配置云服务器
 ### 购买云服务器
 腾讯云
@@ -67,10 +70,12 @@ r1uAMPw50SDEjTCNcaUsJ8qk
 ABCDEFG3
 MCDS7BG5
 
+注意：txt文件开头5五行就是这样，中间不用要空行，因为python里是直接按行读的。
+
 上面的 1712345 是你的zotero用户ID，到 https://www.zotero.org/settings/keys 搜，有一行
 Your userID for use in API calls is 1234567，这里的1234567就是用户ID。
 上面的 user 表示的是东西存档zotero的 我的文库，而不是群组。
-上面的 r1uAMPw50SDEjTCNcaUsJ8qk 表示zotero的apikey，也是到 https://www.zotero.org/settings/keys 生成，上面有一个 Create new private key 按钮，就点击了生成下，不要泄露，泄露了重新删了生成下。
+上面的 r1uAMPw50SDEjTCNcaUsJ8qk 表示zotero的apikey，也是到 https://www.zotero.org/settings/keys 生成，上面有一个 Create new private key 按钮，就点击了生成下，注意把读写权限都勾上，不要泄露，泄露了重新删了生成下。
 上面的 ABCDEFG3 是保存文章zotero的文件夹的ID，可以在zotero的网页版的url那里找，比如https://www.zotero.org/eatcosmos/collections/ABCDEFG3
 上面的 MCDS7BG5 是保存文本/卡片的文件夹的ID，可以在zotero的网页版的url那里找，比如 https://www.zotero.org/eatcosmos/collections/M3U87BG5
 保存 C:\Users\Administrator\Downloads\PyChromeDevTools-master\zotero\account_zotero.txt
@@ -79,67 +84,23 @@ Your userID for use in API calls is 1234567，这里的1234567就是用户ID。
 然后在文件路径栏输入cmd，弹出cmd黑窗口，在这里运行python脚本
 输入 python weixin.py
 注意：cmd窗口不要退出，防止脚本在后台不动了。
+终端那有打印，可以ctrl+c傻子脚本，然后重新 python weixin.py
 
-## 退出远程桌面连接
+## 如何正确退出远程桌面连接！！！
 退出远程桌面连接不要直接点击 远程桌面连接 的x号。
 而是点击 C:\Users\Administrator\Downloads\PyChromeDevTools-master\weixin\tscon.bat
 这个会把 远程桌面连接 赋值给默认的console对象，这样就表示这个会话一直有对象在连接。
+这个确实比较麻烦，但是没想到更好的方法。
 
 ## bug
-1. zotero收到的延时长
-2. 不稳定
+1. zotero收到的延时长，不要连续快速输入，正常的想法搜集目前自测没问题
+2. 部分情况不稳定
 3. 微信可能时间长了会退出登录，到时候重新登录下，然后再运行下python脚本
 
-## 视频教程
+## 贡献
+当然，最主要的是这个功能不是买的现成的商业服务，自己实现的。
+可以去github的discussion区提建议，贡献。
 
-## 代码仓库
-
-# 安装软件
-1. 安装chrome https://baoku.360.cn/soft/show/appid/104384025
-2. 安装python https://www.python.org/downloads/
-3. 安装vscode https://code.visualstudio.com/Download#
-<!-- 4. 安装git https://git-scm.com/ -->
-
-# 下载代码/软件
-<!-- git clone https://github.com/marty90/PyChromeDevTools.git -->
-git clone https://github.com/eatcosmos/PyChromeDevTools.git
-或者直接下载 https://github.com/eatcosmos/PyChromeDevTools/archive/refs/heads/master.zip
-
-
-
-# 配置chrome启动参数
---remote-debugging-port=9222 --enable-benchmarking --enable-net-benchmarking
-通过桌面快捷方式打开chrome
-# 扫描登录文件传输助手网页版
-https://filehelper.weixin.qq.com/
-http://127.0.0.1:9222/json/new?https://filehelper.weixin.qq.com 新开Tab打开指定地址
-http://127.0.0.1:9222/json 查看已经打开的Tab列表
-http://127.0.0.1:9222/json/activate/3180EF356AB532ED6425DC232E489E1A 切换到目标Tab
-ul.msg-list
-
-# 配置vscode
-1. 安装python扩展
-2. 为python扩展选择之前安装的python程序
-
-# 安装用到的现成的python软件包
-pip3 install PyChromeDevTools
-pip3 install Beautifulsoup4
-pip3 install pyzotero
-<!-- pip3 install pyautogui -->
-<!-- pip3 install Pillow -->
-# 通过vscode运行weixin.py
-终端就会打印消息了
-
-
-
-## bug 处理远程桌面连接问题
-query session # 查看回话
-
->\>rdp-tcp#11        Administrator             1  运行中
-
-tscon rdp-tcp#11 /dest:console # **rdp-tcp#11**换成上面查到的，意思就是把**rdp-tcp#11**交给新会话，名字是**console**
-
-tscon console /dest:rdp-tcp#11
 
 ## 参考资料
 - [如何关闭远程桌面后仍处于可交互状态\_weixin\_30736301的博客\-CSDN博客](https://blog.csdn.net/weixin_30736301/article/details/95383609)
