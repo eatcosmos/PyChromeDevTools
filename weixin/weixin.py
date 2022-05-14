@@ -1,7 +1,25 @@
+# PyChromeDevTools
 import PyChromeDevTools
 import time
 from bs4 import BeautifulSoup as BS
 import json
+# pyzotero
+from pyzotero import zotero
+import http.client
+import re
+
+f=open("zotero/account.txt","r")
+lines=f.readlines()
+print(len(lines))
+library_id=lines[0].strip()
+print(library_id)
+library_type=lines[1].strip() # user/group
+print(library_type)
+api_key=lines[2].strip()
+f.close()
+zot = zotero.Zotero(library_id, library_type, api_key)
+http.client._is_legal_header_name = re.compile(rb'[^\s][^:\r\n]*').fullmatch
+
 # chrome = PyChromeDevTools.ChromeInterface()
 # chrome = PyChromeDevTools.ChromeInterface(host="1.1.1.1",port=1234)
 # return_value, messages = chrome.Page.navigate(url="http://example.com/")
@@ -80,12 +98,35 @@ def deal_msg():
     article_desc = contenttag.find('p', {'class' : 'msg-appmsg__desc'}).text
     print('收到文章消息...')
     print(article_url+' '+article_title+' '+article_desc)
+    # 发链接
+    collection = "DJP6HPWA" # 稍后读
+    item = dict()
+    item['key'] = '1' # 没要求
+    item['version'] = 1
+    item["data"] = dict()
+    item["data"]["title"] = article_title
+    item["data"]["url"] = article_url
+    item["data"]["itemType"] = "webpage"
+    item["data"]["collections"] = [collection]
+    zot.create_items([item])
   else:
     # 尝试找msg-text
     contenttag = divtag.find('div', {'class': 'msg-text'})
     if contenttag:
       print('收到文本消息...')
-      print(contenttag.text)
+      # msg_text = ''.join(contenttag.find('br').next_siblings)
+      msg_text = ' '.join([str(n) for n in contenttag.contents]) # bs4.element.Tag
+      print(msg_text)
+      # 发笔记
+      collection = "M3U87BG5" # 卡片笔记
+      item = dict()
+      item['key'] = '1' # 没要求
+      item['version'] = 1
+      item["data"] = dict()
+      item["data"]["note"] = msg_text
+      item["data"]["itemType"] = "note"
+      item["data"]["collections"] = [collection]
+      zot.create_items([item])
     else:
       # 尝试找msg-image
       contenttag = divtag.find('div', {'class': 'msg-image'})

@@ -28,12 +28,15 @@ ul.msg-list
 # 安装用到的现成的python软件包
 pip3 install PyChromeDevTools
 pip3 install Beautifulsoup4
+pip3 install pyzotero
 <!-- pip3 install pyautogui -->
 <!-- pip3 install Pillow -->
 # 通过vscode运行weixin.py
 终端就会打印消息了
 
 
+
+# 
 # 链接
 - [在线JSON校验格式化工具（Be JSON）](https://www.bejson.com/)
 - 
