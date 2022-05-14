@@ -36,32 +36,17 @@ pip3 install pyzotero
 
 
 
-# 
-# 链接
-- [在线JSON校验格式化工具（Be JSON）](https://www.bejson.com/)
-- 
-# 图形用户界面自动化，用不到
-# pyautogui
-import  pyautogui
-wh  =  pyautogui.size()
-for i in range(10):
-  # Move mouse in a square     
-  pyautogui.moveTo(100, 100, duration=0.25)
-  pyautogui.moveTo(200, 100, duration=0.25)
-  pyautogui.moveTo(200, 200, duration=0.25)
-  pyautogui.moveTo(100, 200, duration=0.25)
-for i in range(10)
-  pyautogui.move(100, 0, duration=0.25)     # right
-  pyautogui.move(0, 100, duration=0.25)     # down
-  pyautogui.move(-100, 0, duration=0.25)    # left
-  pyautogui.move(0, -100, duration=0.25)    # up
-pyautogui.position()
-pyautogui.click(10, 5, button='right') # Move mouse to (10, 5) and click.
-pyautogui.mouseDown()
-pyautogui.mouseUp()
-pyautogui.rightClick()
-pyautogui.middleClick()
+## bug 处理远程桌面连接问题
+query session # 查看回话
 
-pyautogui.doubleClick()
+>\>rdp-tcp#11        Administrator             1  运行中
 
-pyautogui.mouseInfo()
+tscon rdp-tcp#11 /dest:console # **rdp-tcp#11**换成上面查到的，意思就是把**rdp-tcp#11**交给新会话，名字是**console**
+
+tscon console /dest:rdp-tcp#11
+
+## 参考资料
+- [如何关闭远程桌面后仍处于可交互状态\_weixin\_30736301的博客\-CSDN博客](https://blog.csdn.net/weixin_30736301/article/details/95383609)
+  - [tscon \| Microsoft Docs](https://docs.microsoft.com/zh-cn/windows-server/administration/windows-commands/tscon)
+  - [Windows系统软件自动化程序不能在mstsc远程断开的时候正常运行的解决方案\_John\_Doe\.的博客\-CSDN博客](https://blog.csdn.net/sinat_34149445/article/details/115314120)
+- [Python JSON \| 菜鸟教程](https://www.runoob.com/python/python-json.html)

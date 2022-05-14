@@ -1,4 +1,5 @@
 # PyChromeDevTools
+import collections
 import PyChromeDevTools
 import time
 from bs4 import BeautifulSoup as BS
@@ -7,15 +8,21 @@ import json
 from pyzotero import zotero
 import http.client
 import re
+#
+import pyautogui
+#
+import os
 
-f=open("zotero/account.txt","r")
+f=open("..\\zotero\\account_zotero.txt","r")
 lines=f.readlines()
-print(len(lines))
+# print(len(lines))
 library_id=lines[0].strip()
-print(library_id)
+# print(library_id)
 library_type=lines[1].strip() # user/group
-print(library_type)
+# print(library_type)
 api_key=lines[2].strip()
+collection_artical=lines[3].strip() # 稍后读
+collection_note=lines[4].strip() # 卡片笔记
 f.close()
 zot = zotero.Zotero(library_id, library_type, api_key)
 http.client._is_legal_header_name = re.compile(rb'[^\s][^:\r\n]*').fullmatch
@@ -77,7 +84,6 @@ def deal_msg():
   # jsObj = json.dumps(dictObj)
   # with open("tmp","w") as f:
   #   json.dump(html,f)
-
   # 把html写入文件
   # with open("tmp","w") as f:
     # f.write(html)
@@ -99,7 +105,7 @@ def deal_msg():
     print('收到文章消息...')
     print(article_url+' '+article_title+' '+article_desc)
     # 发链接
-    collection = "DJP6HPWA" # 稍后读
+    collection = collection_artical # 稍后读
     item = dict()
     item['key'] = '1' # 没要求
     item['version'] = 1
@@ -107,6 +113,7 @@ def deal_msg():
     item["data"]["title"] = article_title
     item["data"]["url"] = article_url
     item["data"]["itemType"] = "webpage"
+    item["data"]["abstractNote"] = article_desc
     item["data"]["collections"] = [collection]
     zot.create_items([item])
   else:
@@ -118,7 +125,7 @@ def deal_msg():
       msg_text = ' '.join([str(n) for n in contenttag.contents]) # bs4.element.Tag
       print(msg_text)
       # 发笔记
-      collection = "M3U87BG5" # 卡片笔记
+      collection = collection_note # 卡片笔记
       item = dict()
       item['key'] = '1' # 没要求
       item['version'] = 1
@@ -158,6 +165,9 @@ def test_PyChromeDevTools():
       idx = idx + 1
     chrome = PyChromeDevTools.ChromeInterface(host="127.0.0.1", port=9222, tab=idx)
     li_cnt_befor, li_cnt_after = 0, 0 # 初始化全局变量
+
+    # 激活chrome
+    # pyautogui.getWindowsWithTitle("微信文件传输助手")[0].activate()
 
     # 启用域/Domains
     chrome.Network.enable()
@@ -200,8 +210,10 @@ def test_PyChromeDevTools():
 
     
     print('循环等待事件...')
-    li_cnt_befor
     while 1:
+      # pyautogui.getWindowsWithTitle("微信文件传输助手")[0].activate()
+      pyautogui.getWindowsWithTitle("微信文件传输助手")[0].maximize()
+      # print(pyautogui.getWindowsWithTitle("微信文件传输助手"))
       matching_event, all_events = chrome.wait_event("Debugger.paused", timeout=1) # 等待事件，立即返回
       if matching_event is None:
         # 处理遗留阻塞信息...
